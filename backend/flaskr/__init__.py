@@ -10,11 +10,9 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
-def paginate_questions(question_data, page=1):
+def paginate(question_data, page=1):
     """
-    Summary line.
-
-    Extended description of function.
+    Chunks a list of question data into appropriately sized chunks.
 
     Parameters:
     page (int): Requested questions page
@@ -22,7 +20,6 @@ def paginate_questions(question_data, page=1):
 
     Returns:
     list: List of dictionaries containing question data
-
     """
     start =  (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
@@ -72,23 +69,32 @@ def create_app(test_config=None):
     @TODO:
     Create an endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
-    This endpoint should return a list of questions,
-    number of total questions, current category, categories.
+    This endpoint should return a list of questions (COMPLETE),
+    number of total questions (COMPLETE), current category (PENDING),
+    categories (PENDING).
 
     TEST: At this point, when you start the application
     you should see questions and categories generated,
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     '''
-    @app.route("/questions/<int:page>", methods=["GET"])
-    def get_questions(page):
+    @app.route("/questions", methods=["GET"])
+    def get_questions():
+        page = request.args.get('page', 1, type=int)
+
+        # Questions
         questions = Question.query.all()
-        paginated_questions = paginate_questions(questions, page=page)
+        paginated_questions = paginate(questions, page=page)
+
+        # Categories
+        categories = [category.format() for category in Category.query.all()]
 
         return jsonify({
             "success": True,
+            "questions": paginated_questions,
             "total_questions": len(paginated_questions),
-            "questions": paginated_questions
+            "categories": categories,
+            "current_category": None # TODO(jordanhuus): find out what current_category is used for
         })
 
 
@@ -100,6 +106,26 @@ def create_app(test_config=None):
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page.
     '''
+    @app.route("/questions/<int:id>", methods=["DELETE"])
+    def delete_question(id):
+        pdb.set_trace()
+        try:
+            # Delete question
+            question = Question.query.get(id)
+            question.delete()
+
+            # Query existing questions
+            questions = Question.query.all()
+            paginated_questions = paginate(questions, page=1)
+
+            return jsonify({
+                "success": True,
+                "deleted_question": question.id,
+                "questions": paginated_questions
+            })
+        except Exception:
+            abort(422)
+
 
     '''
     @TODO:
@@ -122,6 +148,44 @@ def create_app(test_config=None):
     only question that include that string within their question.
     Try using the word "title" to start.
     '''
+    @app.route("/questions", methods=["POST"])
+    def new_or_searched_question():
+        data = request.get_json()
+
+        # Search questions
+        search_term = data["searchTerm"]
+        if search_term:
+            question_results = Question.query.filter(Question.question.ilike(f"%{search_term}%")).all()
+            question_results_formatted = [question.format() for question in question_results]
+
+            return jsonify({
+                "questions": question_results_formatted,
+                "total_questions": len(question_results_formatted),
+                "current_category": None # TODO(jordanhuus): find out what current_category is used for
+            })
+
+        # Submit new question
+        else:
+            question = data["question"]
+            answer = data["answer"]
+            difficulty = data["difficulty"]
+            category = data["category"]
+            new_question = Question(
+                question = question,
+                answer = answer,
+                difficulty = difficulty,
+                category = category
+            )
+
+            # Add to database
+            try:
+                new_question.insert()
+                return jsonify({
+                    "success": True
+                })
+            except Exception:
+                abort(422)
+
 
     '''
     @TODO:
