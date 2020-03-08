@@ -60,8 +60,8 @@ def create_app(test_config=None):
         categories_formatted = [category.format() for category in categories_raw]
 
         return jsonify({
-        "success": True,
-        "categories": categories_formatted
+            "success": True,
+            "categories": categories_formatted
         })
 
 
@@ -195,6 +195,19 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     '''
+    @app.route("/categories/<int:id>/questions", methods=["GET"])
+    def get_questions_by_category(id):
+        try:
+            questions = Question.query.filter(Question.category == id)
+            paginated_questions = paginate(questions, 1)
+            return jsonify({
+                "sucess": True,
+                "questions": paginated_questions,
+                "current_category": id,
+                "total_questions": len(paginated_questions)
+            })
+        except Exception:
+            abort(422)
 
 
     '''
@@ -208,11 +221,56 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     '''
+    @app.route("/quizzes", methods=["POST"])
+    def get_quiz_question():
+        # Rrequest data
+        data = request.get_json()
+        previous_questions = data["previous_questions"]
+        quiz_category = data["quizCategory"]
+
+        # Potential new questions
+        question_candidates = []
+        for question in Question.query.filter(Question.category == quiz_category):
+            for previous_question in previous_questions:
+                if question.question != previous_question["question"]:
+                    question_candidates.append(question.format())
+
+        # Return new quiz questions
+        return jsonify({
+            "success": True,
+            "question": question_candidates[int(round(random.random() * len(question_candidates)-1, 0))]["question"]
+        })
+
+
 
     '''
     @TODO:
     Create error handlers for all expected errors
     including 404 and 422.
     '''
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "resource not found"
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "unprocessable"
+        }), 422
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "bad request"
+        }), 400
+
 
     return app
