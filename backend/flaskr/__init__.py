@@ -57,7 +57,7 @@ def create_app(test_config=None):
     def get_categories():
 
         categories_raw = Category.query.all()
-        categories_formatted = [category.format() for category in categories_raw]
+        categories_formatted = [category.id for category in categories_raw]
 
         return jsonify({
             "success": True,
@@ -87,7 +87,7 @@ def create_app(test_config=None):
         paginated_questions = paginate(questions, page=page)
 
         # Categories
-        categories = [category.format() for category in Category.query.all()]
+        categories = [category.id for category in Category.query.all()]
 
         return jsonify({
             "success": True,
