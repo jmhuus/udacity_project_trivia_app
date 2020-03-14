@@ -56,7 +56,11 @@ def create_app(test_config=None):
     @app.route("/categories", methods=["GET"])
     def get_categories():
 
-        categories_raw = Category.query.all()
+        # Available categories based on questions
+        available_category_ids = list([question.category for question in Question.query.all()])
+
+        # Return only categories that have associated questions
+        categories_raw = Category.query.filter(Category.id.in_(available_category_ids))
         categories_formatted = {}
         for category in categories_raw:
             categories_formatted[category.id] = category.type
@@ -230,15 +234,24 @@ def create_app(test_config=None):
         previous_questions = data["previous_questions"]
         quiz_category = data["quiz_category"]
 
-        # Potential new questions
+        # New quiz questions
         question_candidates = []
-        a = Question.query.filter(Question.category == quiz_category["id"])
-        for question in Question.query.filter(Question.category == quiz_category["id"]):
-            if not question.question in [previous_question["question"] for previous_question in previous_questions]:
-                question_candidates.append(question.format())
+
+        # Return all categories
+        if quiz_category["type"] == "all":
+            for question in Question.query.all():
+                if not question.question in [previous_question["question"] for previous_question in previous_questions]:
+                    question_candidates.append(question.format())
+
+        # Return filtered results
+        else:
+            for question in Question.query.filter(Question.category == quiz_category["id"]):
+                if not question.question in [previous_question["question"] for previous_question in previous_questions]:
+                    question_candidates.append(question.format())
 
         # Return new quiz questions
-        selected_question = question_candidates[int(round(random.random() * len(question_candidates), 0))]
+        chosen_index = int(round(random.random() * len(question_candidates), 0))-1
+        selected_question = question_candidates[chosen_index]
         return jsonify({
             "success": True,
             "question": selected_question
