@@ -57,7 +57,9 @@ def create_app(test_config=None):
     def get_categories():
 
         categories_raw = Category.query.all()
-        categories_formatted = [category.id for category in categories_raw]
+        categories_formatted = {}
+        for category in categories_raw:
+            categories_formatted[category.id] = category.type
 
         return jsonify({
             "success": True,
@@ -226,19 +228,20 @@ def create_app(test_config=None):
         # Rrequest data
         data = request.get_json()
         previous_questions = data["previous_questions"]
-        quiz_category = data["quizCategory"]
+        quiz_category = data["quiz_category"]
 
         # Potential new questions
         question_candidates = []
-        for question in Question.query.filter(Question.category == quiz_category):
-            for previous_question in previous_questions:
-                if question.question != previous_question["question"]:
-                    question_candidates.append(question.format())
+        a = Question.query.filter(Question.category == quiz_category["id"])
+        for question in Question.query.filter(Question.category == quiz_category["id"]):
+            if not question.question in [previous_question["question"] for previous_question in previous_questions]:
+                question_candidates.append(question.format())
 
         # Return new quiz questions
+        selected_question = question_candidates[int(round(random.random() * len(question_candidates), 0))]
         return jsonify({
             "success": True,
-            "question": question_candidates[int(round(random.random() * len(question_candidates)-1, 0))]["question"]
+            "question": selected_question
         })
 
 

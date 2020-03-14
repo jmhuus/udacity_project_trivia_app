@@ -1,7 +1,7 @@
 .vscode
 __pycache__
 venv
-node_modeules
+node_modules
 
 # OS generated files #
 ######################
