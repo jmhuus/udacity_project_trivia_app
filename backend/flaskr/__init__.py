@@ -256,7 +256,7 @@ def create_app(test_config=None):
 
         # Return new quiz questions
         chosen_index = int(round(random.random() * len(question_candidates), 0))-1
-        selected_question = question_candidates[chosen_index] if chosen_index>=0 else None
+        selected_question = question_candidates[chosen_index] if len(question_candidates)>0 else None
         return jsonify({
             "success": True,
             "question": selected_question
