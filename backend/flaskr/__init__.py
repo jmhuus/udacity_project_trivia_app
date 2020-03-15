@@ -234,24 +234,29 @@ def create_app(test_config=None):
         previous_questions = data["previous_questions"]
         quiz_category = data["quiz_category"]
 
+        print()
+        print()
+        print()
+        print(previous_questions)
+
         # New quiz questions
         question_candidates = []
 
         # Return all categories
         if quiz_category["type"] == "all":
             for question in Question.query.all():
-                if not question.question in [previous_question["question"] for previous_question in previous_questions]:
+                if not question.id in previous_questions:
                     question_candidates.append(question.format())
 
         # Return filtered results
         else:
             for question in Question.query.filter(Question.category == quiz_category["id"]):
-                if not question.question in [previous_question["question"] for previous_question in previous_questions]:
+                if not question.id in previous_questions:
                     question_candidates.append(question.format())
 
         # Return new quiz questions
         chosen_index = int(round(random.random() * len(question_candidates), 0))-1
-        selected_question = question_candidates[chosen_index]
+        selected_question = question_candidates[chosen_index] if chosen_index>=0 else None
         return jsonify({
             "success": True,
             "question": selected_question
