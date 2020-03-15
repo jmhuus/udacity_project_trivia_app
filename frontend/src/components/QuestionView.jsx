@@ -127,13 +127,6 @@ class QuestionView extends Component {
     }
   };
 
-  // {Object.keys(this.state.categories).map((id, ) => (
-  //   <li key={id} onClick={() => {this.getByCategory(id)}}>
-  //     {this.state.categories[id]}
-  // <img className="category" src={`${category.url}.svg`}/>
-  //   </li>
-  // ))}
-
   render() {
     console.log(this.state.categories);
     return (
@@ -147,18 +140,13 @@ class QuestionView extends Component {
             Categories
           </h2>
           <ul>
-            {this.state.categories &&
-              this.state.categories.map(category => (
-                <li
-                  key={category.id}
-                  onClick={() => this.getByCategory(category.id)}
-                >
-                  {category.type}
-                  {
-                    //<img className="category" src={`${this.state.categories[id]}.svg`}/>
-                  }
+              {Object.keys(this.state.categories).map((id) => {
+                return (
+                <li key={id} onClick={() => {this.getByCategory(id)}}>
+                  {this.state.categories[id]}
+                  <img className="category" src={`${this.state.categories[id]}.svg`}/>
                 </li>
-              ))}
+            )})}
           </ul>
           <Search submitSearch={this.submitSearch} />
         </div>

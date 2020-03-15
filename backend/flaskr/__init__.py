@@ -92,14 +92,20 @@ def create_app(test_config=None):
         questions = Question.query.all()
         paginated_questions = paginate(questions, page=page)
 
-        # Categories
-        categories = [category.id for category in Category.query.all()]
+        # Available categories based on questions
+        available_category_ids = list([question.category for question in Question.query.all()])
+
+        # Return only categories that have associated questions
+        categories_raw = Category.query.filter(Category.id.in_(available_category_ids))
+        categories_formatted = {}
+        for category in categories_raw:
+            categories_formatted[category.id] = category.type
 
         return jsonify({
             "success": True,
             "questions": paginated_questions,
             "total_questions": len(paginated_questions),
-            "categories": categories,
+            "categories": categories_formatted,
             "current_category": None # TODO(jordanhuus): find out what current_category is used for
         })
 
@@ -233,11 +239,6 @@ def create_app(test_config=None):
         data = request.get_json()
         previous_questions = data["previous_questions"]
         quiz_category = data["quiz_category"]
-
-        print()
-        print()
-        print()
-        print(previous_questions)
 
         # New quiz questions
         question_candidates = []
