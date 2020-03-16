@@ -56,7 +56,7 @@ Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` d
 One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior.
 
 1. **DONE** Use Flask-CORS to enable cross-domain requests and set response headers.
-2. Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
+2. **DONE** Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
 3. **DONE** Create an endpoint to handle GET requests for all available categories.
 4. **DONE** Create an endpoint to DELETE question using a question ID.
 5. **DONE** Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score.
