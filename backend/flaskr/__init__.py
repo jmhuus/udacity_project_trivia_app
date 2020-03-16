@@ -164,7 +164,7 @@ def create_app(test_config=None):
         data = request.get_json()
 
         # Search questions
-        search_term = data["searchTerm"]
+        search_term = data["searchTerm"] if  "searchTerm" in data.keys() else None
         if search_term:
             question_results = Question.query.filter(Question.question.ilike(f"%{search_term}%")).all()
             question_results_formatted = [question.format() for question in question_results]
