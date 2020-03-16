@@ -76,8 +76,8 @@ def create_app(test_config=None):
     Create an endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
     This endpoint should return a list of questions (COMPLETE),
-    number of total questions (COMPLETE), current category (PENDING),
-    categories (PENDING).
+    number of total questions (COMPLETE), current category (COMPLETE),
+    categories (COMPLETE).
 
     TEST: At this point, when you start the application
     you should see questions and categories generated,
@@ -105,8 +105,7 @@ def create_app(test_config=None):
             "success": True,
             "questions": paginated_questions,
             "total_questions": len(questions),
-            "categories": categories_formatted,
-            "current_category": None # TODO(jordanhuus): find out what current_category is used for
+            "categories": categories_formatted
         })
 
 
@@ -172,8 +171,7 @@ def create_app(test_config=None):
 
             return jsonify({
                 "questions": question_results_formatted,
-                "total_questions": len(question_results_formatted),
-                "current_category": None # TODO(jordanhuus): find out what current_category is used for
+                "total_questions": len(question_results_formatted)
             })
 
         # Submit new question
@@ -215,7 +213,6 @@ def create_app(test_config=None):
             return jsonify({
                 "sucess": True,
                 "questions": paginated_questions,
-                "current_category": id,
                 "total_questions": len(paginated_questions)
             })
         except Exception:

@@ -12,8 +12,7 @@ class QuestionView extends Component {
       questions: [],
       page: 1,
       totalQuestions: 0,
-      categories: [],
-      currentCategory: null
+      categories: []
     };
   }
 
@@ -29,8 +28,7 @@ class QuestionView extends Component {
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
-          categories: result.categories,
-          currentCategory: result.current_category
+          categories: result.categories
         });
         return;
       },
@@ -73,8 +71,7 @@ class QuestionView extends Component {
       success: result => {
         this.setState({
           questions: result.questions,
-          totalQuestions: result.total_questions,
-          currentCategory: result.current_category
+          totalQuestions: result.total_questions
         });
         return;
       },
@@ -99,8 +96,7 @@ class QuestionView extends Component {
       success: result => {
         this.setState({
           questions: result.questions,
-          totalQuestions: result.total_questions,
-          currentCategory: result.current_category
+          totalQuestions: result.total_questions
         });
         return;
       },
