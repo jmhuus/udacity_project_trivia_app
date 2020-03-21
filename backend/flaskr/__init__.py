@@ -159,7 +159,8 @@ def create_app(test_config=None):
             try:
                 new_question.insert()
                 return jsonify({
-                    "success": True
+                    "success": True,
+                    "new_question_id": new_question.id
                 })
             except Exception:
                 abort(422)
@@ -173,7 +174,7 @@ def create_app(test_config=None):
             questions = Question.query.filter(Question.category == id)
             paginated_questions = paginate(questions, 1)
             return jsonify({
-                "sucess": True,
+                "success": True,
                 "questions": paginated_questions,
                 "total_questions": len(paginated_questions)
             })
