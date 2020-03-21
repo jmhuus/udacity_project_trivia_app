@@ -21,7 +21,7 @@ def paginate(question_data, page=1):
     Returns:
     list: List of dictionaries containing question data
     """
-    
+
     start =  (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
 
@@ -48,7 +48,7 @@ def create_app(test_config=None):
 
     @app.route("/categories", methods=["GET"])
     def get_categories():
-        """Get all categories formatted as {1: 'Science', 2: 'Geography', ...} """"
+        """Get all categories formatted as {1: 'Science', 2: 'Geography', ...} """
 
         # Available categories based on questions
         available_category_ids = list([question.category for question in Question.query.all()])
@@ -99,7 +99,6 @@ def create_app(test_config=None):
     def delete_question(id):
         """Delete request for a specific question."""
 
-        pdb.set_trace()
         try:
             # Delete question
             question = Question.query.get(id)
