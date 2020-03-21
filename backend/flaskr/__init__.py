@@ -77,6 +77,8 @@ def create_app(test_config=None):
         # Questions
         questions = Question.query.all()
         paginated_questions = paginate(questions, page=page)
+        if len(paginated_questions) == 0:
+            abort(404)
 
         # Available categories based on questions
         available_category_ids = list([question.category for question in Question.query.all()])
@@ -144,24 +146,28 @@ def create_app(test_config=None):
 
         # Submit new question
         else:
-            question = data["question"]
-            answer = data["answer"]
-            difficulty = data["difficulty"]
-            category = data["category"]
-            new_question = Question(
-                question = question,
-                answer = answer,
-                difficulty = difficulty,
-                category = category
-            )
-
-            # Add to database
             try:
+                question = data["question"]
+                answer = data["answer"]
+                difficulty = data["difficulty"]
+                category = data["category"]
+                new_question = Question(
+                    question = question,
+                    answer = answer,
+                    difficulty = difficulty,
+                    category = category
+                )
+
+
                 new_question.insert()
                 return jsonify({
                     "success": True,
                     "new_question_id": new_question.id
                 })
+            except KeyError:
+                # A question parameter was omitted
+                abort(400)
+
             except Exception:
                 abort(422)
 
@@ -170,9 +176,12 @@ def create_app(test_config=None):
     def get_questions_by_category(id):
         """Retrieve questions based on a given category."""
 
+        questions = Question.query.filter(Question.category == id)
+        paginated_questions = paginate(questions, 1)
+        if len(paginated_questions) == 0:
+            abort(404)
+
         try:
-            questions = Question.query.filter(Question.category == id)
-            paginated_questions = paginate(questions, 1)
             return jsonify({
                 "success": True,
                 "questions": paginated_questions,
